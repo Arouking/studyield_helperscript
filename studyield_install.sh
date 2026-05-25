@@ -4,12 +4,11 @@
 # License: MIT
 # Source: https://github.com/studyield/studyield
 
-# Falls das Skript außerhalb des Frameworks läuft, Pfad setzen
-if [ -z "$FUNCTIONS_FILE_PATH" ]; then
-    export FUNCTIONS_FILE_PATH="https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/lines/functions.sh"
-fi
-
+# Framework-Pfad erzwingen und Funktionen laden
+export FUNCTIONS_FILE_PATH="https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/lines/functions.sh"
 source /dev/stdin <<<"$(curl -fsSL $FUNCTIONS_FILE_PATH)"
+
+# tteck-Basisroutinen initialisieren
 color
 verb_ip6
 catch_errors
@@ -25,7 +24,7 @@ $STD apt install -y \
   nginx
 msg_ok "Installed Dependencies"
 
-# Die offiziellen Framework-Funktionen nutzen
+# Die offiziellen Framework-Funktionen für Node.js nutzen
 NODE_VERSION="20" setup_nodejs
 $STD npm install -g pm2
 msg_ok "Installed Node.js and PM2"
@@ -79,7 +78,7 @@ server {
 }
 EOF
 
-# Default-Seite entfernen und neue Konfiguration verlinken
+# Alte Nginx-Default-Seite entfernen und neue Konfiguration aktivieren
 rm -f /etc/nginx/sites-enabled/default
 ln -sf /etc/nginx/sites-available/studyield /etc/nginx/sites-enabled/studyield
 systemctl restart nginx
@@ -108,7 +107,7 @@ module.exports = {
 };
 EOF
 
-# PM2 persistent in systemd verankern und starten
+# PM2-Dienste im systemd-Boot verankern und starten
 pm2 startup systemd -u root --hp /root
 pm2 start /opt/studyield/ecosystem.config.js
 pm2 save
