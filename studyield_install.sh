@@ -4,7 +4,12 @@
 # License: MIT
 # Source: https://github.com/studyield/studyield
 
-source /dev/stdin <<<"$FUNCTIONS_FILE_PATH"
+# Falls das Skript außerhalb des Frameworks läuft, Pfad setzen
+if [ -z "$FUNCTIONS_FILE_PATH" ]; then
+    export FUNCTIONS_FILE_PATH="https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/lines/functions.sh"
+fi
+
+source /dev/stdin <<<"$(curl -fsSL $FUNCTIONS_FILE_PATH)"
 color
 verb_ip6
 catch_errors
@@ -74,7 +79,7 @@ server {
 }
 EOF
 
-# Der offizielle tteck-Move: Default-Seite weghauen und verlinken
+# Default-Seite entfernen und neue Konfiguration verlinken
 rm -f /etc/nginx/sites-enabled/default
 ln -sf /etc/nginx/sites-available/studyield /etc/nginx/sites-enabled/studyield
 systemctl restart nginx
